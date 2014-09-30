@@ -1,6 +1,8 @@
 package com.example.chasethetrace;
 
+import java.text.DecimalFormat;
 import java.util.Properties;
+import android.app.Activity;
 
 import javax.activation.DataHandler;
 import javax.mail.Message;
@@ -16,6 +18,8 @@ import javax.mail.util.ByteArrayDataSource;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -32,26 +36,26 @@ public class MainActivity extends ActionBarActivity {
 	 * 		Platz für die Funktionen!
 	 * 
 	 */
+	LocationManager locationManager;
+	String currentLocation = "no position provided";
 	
-	public String getLocation(){
-		String location = "";
-		
-		//Location Manager zur Verwaltung von Standorten:
-		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
-		
-		
-		return location;
-		
+	public void sendLocationEmail(View v){
+		try {
+		sendEmail("Neue Position!", "http://www.maps.google.com/maps/?q=loc:" + currentLocation);
+		}
+		catch (Exception e) {}
+	}
+	
+	public String convertToString(Location position){
+		DecimalFormat df = new DecimalFormat("#.###");
+		String locationString = df.format(position.getLatitude()) + "," + df.format(position.getLongitude());
+		return locationString;
 	}
 	
 	
 	@SuppressLint("NewApi")
 	public static void sendEmail(String subject, String content) throws AddressException, MessagingException {
-		
-		//Internetzugriff aus der "Main Activity" erlauben:
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy);
+
 		
 		
 		//Festlegung der Variablen für smtp aus der Datenbank für die "Session":
@@ -106,7 +110,7 @@ public class MainActivity extends ActionBarActivity {
 		//Transportbefehl ausführen:
 		transport.sendMessage(message, message.getAllRecipients());
 		transport.close();
-		Log.v("Lol", "Email versendet.. Hoffe ich.");
+		Log.v("Lol", "Email versendet!");
 	}
 
 	
@@ -117,21 +121,34 @@ public class MainActivity extends ActionBarActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		Button button = (Button) findViewById(R.id.button_send);
-		button.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v) {
-		        // Ausgeführte Logik bei Klick des Buttons
-		    	try {
-		    		sendEmail("TestMail", "TestMail!");
-		    	}
-		    	catch (Exception e){
-		    		Log.v("Error beim Email-Senden:", e.toString());
-		    	}
-		    }
-		});
+		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		
+		LocationListener listener = new LocationListener(){
+	        @Override
+	        public void onLocationChanged(Location location) {
+	    		currentLocation = convertToString(location);
+	    		Log.v("Check", currentLocation);
+	        }
+	        	// Uninteressante Optionen, die aber trotzdem gehandlet werden müssen:
+	        @Override
+	        public void onProviderDisabled(String provider) {}
+	        @Override
+	        public void onProviderEnabled(String provider) {}
+	        @Override
+	        public void onStatusChanged(String provider, int status,Bundle extras) {}
+		};
+		
+		if (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null){
+			currentLocation = convertToString(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+		}
+		
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener, null);
+
 	}
 
 	@Override
@@ -152,4 +169,6 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+
 }

@@ -16,6 +16,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="14dp"
         android:minWidth="200dp"
-        android:text="@string/Emailbutton" />
+        android:text="@string/Emailbutton" 
+        android:onClick= "sendLocationEmail"/>
 
 </RelativeLayout>
