@@ -17,10 +17,15 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
@@ -29,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
 	
@@ -37,13 +43,32 @@ public class MainActivity extends ActionBarActivity {
 	 * 
 	 */
 	LocationManager locationManager;
-	String currentLocation = "no position provided";
+	String currentLocation;
+	SharedPreferences sharedPref;
+	
+	public void saveEmail(View v){
+		EditText et = (EditText)findViewById(R.id.Emailfeld);
+		
+		SharedPreferences.Editor editor = sharedPref.edit();
+		
+		Log.v("Adresse:", "1  Adresse:" + et.getText().toString());
+		editor.putBoolean("isFirstOpen", false);
+		editor.putString("receiving_email_adress", et.getText().toString());
+		editor.commit();
+		
+		Log.v("EmailAdresse:", "2  Adresse:" + sharedPref.getString("receiving_email_adress", null) + sharedPref.getBoolean("isFirstOpen", true));
+		super.setContentView(R.layout.activity_main);
+	}
 	
 	public void sendLocationEmail(View v){
 		try {
-		sendEmail("Neue Position!", "http://www.maps.google.com/maps/?q=loc:" + currentLocation);
+			if (currentLocation != null){
+				sendEmail("Resquebutton gedrückt!", "http://www.maps.google.com/maps/?q=loc:" + currentLocation);
+			} else {
+				sendEmail("Resquebutton gedrückt!", "Leider konnte keine Position bestimmt werden.");
+			}
 		}
-		catch (Exception e) {}
+		catch (Exception e) {Log.v("error:", e.toString());}
 	}
 	
 	public String convertToString(Location position){
@@ -54,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
 	
 	
 	@SuppressLint("NewApi")
-	public static void sendEmail(String subject, String content) throws AddressException, MessagingException {
+	public void sendEmail(String subject, String content) throws AddressException, MessagingException {
 
 		
 		
@@ -64,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
 		
 		String from = "chasethetracenoreply@gmail.com";
 		String pass = "cttaelns";
-		String to="lasse.stettner@gmail.com";
+		String to = sharedPref.getString("receiving_email_adress", null);
 		
 		Multipart multiPart;
 		String finalString="";
@@ -119,12 +144,26 @@ public class MainActivity extends ActionBarActivity {
 	 * 
 	 */
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		
+		//Herausfinden, ob die App das erste Mal gestartet wird:
+		
+		sharedPref = getSharedPreferences("ChaseTheTrace", 0);
+		if (sharedPref.getBoolean("isFirstOpen", true) == true){
+			Log.v("log", "way to go!");
+			setContentView(R.layout.first_open);
+		}
+		else {
+			Log.v("crap", "crap");
+			setContentView(R.layout.activity_main);
+		}
+		
+		//Location-Listener registrieren:
 		
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		
@@ -148,7 +187,12 @@ public class MainActivity extends ActionBarActivity {
 		}
 		
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener, null);
+		
+		
+		//Hintergrundprozess starten:
 
+		//Intent backgroundservice = new Intent(this, Hintergrundprozess.class);
+        //startService(backgroundservice);
 	}
 
 	@Override

@@ -9,7 +9,7 @@
         android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="7"
         android:targetSdkVersion="21" />
 
     <application
@@ -26,6 +26,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!--   <service android:name=".WTDStartedService">
+            <intent-filter>
+                <action android:name="de.whatthedroid.startedservices.WTDStartedActivity">
+                </action>
+            </intent-filter>
+        </service> -->
     </application>
 
 </manifest>
