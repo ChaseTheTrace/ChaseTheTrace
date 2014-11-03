@@ -1,32 +1,46 @@
 package com.example.chasethetrace;
 
-import android.app.Service;
+import javax.mail.MessagingException;
+import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
-public class Hintergrundprozess extends Service{
-	public IBinder onBind(Intent intent) {
-        //Irrelevant, gehört zu boundServices
-        return null;
-    }
- 
-    @Override
-    public void onCreate() {
-        Log.v("Hintergrundprozess", "Hintergrundprozess erstellt.");
-    }
- 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-    	Log.v("Hintergrundprozess", "Hintergrundprozess gestartet.");
+public class Hintergrundprozess extends IntentService {
+	public static String Email_adress;  
+	private static final int INTERVAL = 30000;
+	Email email;
+	
+	public Hintergrundprozess() {
+		super("ChaseTheTrace Hintergrundprozess");
+		email = new Email(this);
+	}
+	
+	public void onCreate(){}
 
-    	
-    	
-        return START_STICKY;
-    }
- 
-    @Override
-    public void onDestroy() {
-    	Log.v("Hintergrundprozess", "Hintergrundprozess zerstört.");
-    }
+	public void onDestroy(){}
+	
+	@Override
+	public int onStartCommand(Intent workIntent, int flags, int startId) {
+		Email_adress = workIntent.getStringExtra("passed_email");
+		while (true) {
+			try {
+				Thread.sleep(INTERVAL);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		Log.v("Debug", "Durchlauf!");
+		try {
+			email.sendEmail(Email_adress, "Automatisches Positionsupdate", "");
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		}
+	}
+
+	@Override
+	protected void onHandleIntent(Intent intent) {
+		// TODO Auto-generated method stub
+		
+	}
 }

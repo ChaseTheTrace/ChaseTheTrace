@@ -18,5 +18,6 @@
         android:minWidth="200dp"
         android:text="@string/button_resque" 
         android:onClick="sendLocationEmail"/>
+    
 
 </RelativeLayout>

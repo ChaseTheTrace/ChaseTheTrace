@@ -1,31 +1,14 @@
 package com.example.chasethetrace;
 
 import java.text.DecimalFormat;
-import java.util.Properties;
-import android.app.Activity;
-
-import javax.activation.DataHandler;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
-
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
+import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
@@ -33,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
@@ -45,27 +27,34 @@ public class MainActivity extends ActionBarActivity {
 	LocationManager locationManager;
 	String currentLocation;
 	SharedPreferences sharedPref;
+	Email email;
 	
 	public void saveEmail(View v){
 		EditText et = (EditText)findViewById(R.id.Emailfeld);
 		
 		SharedPreferences.Editor editor = sharedPref.edit();
 		
-		Log.v("Adresse:", "1  Adresse:" + et.getText().toString());
 		editor.putBoolean("isFirstOpen", false);
 		editor.putString("receiving_email_adress", et.getText().toString());
 		editor.commit();
 		
-		Log.v("EmailAdresse:", "2  Adresse:" + sharedPref.getString("receiving_email_adress", null) + sharedPref.getBoolean("isFirstOpen", true));
 		super.setContentView(R.layout.activity_main);
+		
+		//Hintergrundprozess starten:
+		
+		Log.v("Debug", "Starting Intent!");
+		Intent HintergrundService = new Intent(this, Hintergrundprozess.class);
+		HintergrundService.putExtra("passed_email", sharedPref.getString("receiving_email_adress", null));
+        startService(HintergrundService);
+        
 	}
 	
 	public void sendLocationEmail(View v){
 		try {
 			if (currentLocation != null){
-				sendEmail("Resquebutton gedrückt!", "http://www.maps.google.com/maps/?q=loc:" + currentLocation);
+				email.sendEmail(sharedPref.getString("receiving_email_adress", null), "Resquebutton gedrückt!", "http://www.maps.google.com/maps/?q=loc:" + currentLocation);
 			} else {
-				sendEmail("Resquebutton gedrückt!", "Leider konnte keine Position bestimmt werden.");
+				email.sendEmail(sharedPref.getString("receiving_email_adress", null), "Resquebutton gedrückt!", "Leider konnte keine Position bestimmt werden.");
 			}
 		}
 		catch (Exception e) {Log.v("error:", e.toString());}
@@ -78,65 +67,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	
-	@SuppressLint("NewApi")
-	public void sendEmail(String subject, String content) throws AddressException, MessagingException {
-
-		
-		
-		//Festlegung der Variablen für smtp aus der Datenbank für die "Session":
-		String host = "smtp.gmail.com";
-		String address = "chasethetracenoreply@gmail.com";
-		
-		String from = "chasethetracenoreply@gmail.com";
-		String pass = "cttaelns";
-		String to = sharedPref.getString("receiving_email_adress", null);
-		
-		Multipart multiPart;
-		String finalString="";
-		
-		//Eigenschaften (Properties) für die session festlegen:
-		Properties props = System.getProperties();
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", host);
-		props.put("mail.smtp.user", address);
-		props.put("mail.smtp.password", pass);
-		props.put("mail.smtp.port", "587");
-		props.put("mail.smtp.auth", "true");
-		Session session = Session.getDefaultInstance(props, null);
-		
-		//Session und Datahandler (zur Übertragung der Daten) in einer 
-		//Mime-Message zusammenfassen:
-		DataHandler handler=new DataHandler(new ByteArrayDataSource(finalString.getBytes(),"text/plain" ));
-		MimeMessage message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(from));
-		message.setDataHandler(handler);
-		
-		multiPart=new MimeMultipart();
-
-		//Empfängeradresse in Internetadresse umwandeln und der Mime-Message als 
-		//Eigenschaft anhängen:
-		InternetAddress toAddress;
-		toAddress = new InternetAddress(to);
-		message.addRecipient(Message.RecipientType.TO, toAddress);
-		
-		//Betreff, eigentlicher Emailinhalt und der Verweis auf den hier verwendeten
-		//multiPart werden der Mime-Message übergeben:
-		message.setSubject(subject);
-		message.setContent(multiPart);
-		message.setText(content);
-		
-		
-		//Transport initiieren:
-		Transport transport = session.getTransport("smtp");
-		
-		//Transportbefehl mit dem Email Server verbinden:
-		transport.connect(host,address , pass);
-		
-		//Transportbefehl ausführen:
-		transport.sendMessage(message, message.getAllRecipients());
-		transport.close();
-		Log.v("Lol", "Email versendet!");
-	}
+	
 
 	
 	/*
@@ -154,6 +85,8 @@ public class MainActivity extends ActionBarActivity {
 		//Herausfinden, ob die App das erste Mal gestartet wird:
 		
 		sharedPref = getSharedPreferences("ChaseTheTrace", 0);
+		email = new Email(this);
+		
 		if (sharedPref.getBoolean("isFirstOpen", true) == true){
 			Log.v("log", "way to go!");
 			setContentView(R.layout.first_open);
@@ -161,6 +94,11 @@ public class MainActivity extends ActionBarActivity {
 		else {
 			Log.v("crap", "crap");
 			setContentView(R.layout.activity_main);
+			
+			//Hintergrundprozess starten:
+			Intent HintergrundService = new Intent(this, Hintergrundprozess.class);
+			HintergrundService.putExtra("passed_email", sharedPref.getString("receiving_email_adress", null));
+	        startService(HintergrundService);
 		}
 		
 		//Location-Listener registrieren:
@@ -187,12 +125,6 @@ public class MainActivity extends ActionBarActivity {
 		}
 		
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener, null);
-		
-		
-		//Hintergrundprozess starten:
-
-		//Intent backgroundservice = new Intent(this, Hintergrundprozess.class);
-        //startService(backgroundservice);
 	}
 
 	@Override

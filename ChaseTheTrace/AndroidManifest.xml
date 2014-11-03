@@ -9,7 +9,7 @@
         android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-sdk
-        android:minSdkVersion="7"
+        android:minSdkVersion="8"
         android:targetSdkVersion="21" />
 
     <application
@@ -27,12 +27,15 @@
             </intent-filter>
         </activity>
         
-        <!--   <service android:name=".WTDStartedService">
+        <service 
+            android:enabled="true" 
+            android:name=".Hintergrundprozess" 
+            android:exported="true"
+            android:process=":remote">
             <intent-filter>
-                <action android:name="de.whatthedroid.startedservices.WTDStartedActivity">
-                </action>
             </intent-filter>
-        </service> -->
+        </service>
+        
     </application>
 
 </manifest>
