@@ -4,8 +4,8 @@
 	<!--suppress MissingTranslation -->
     <string name="app_name" >Chase The Trace</string>
     <string name="action_settings">Settings</string>
-    <string name="button_resque">Rescue me now!</string>
+    <string name="button_resque">Hilfe!</string>
     <string name="button_save_email">Speichere die Eingabe und starte die App!</string>
-    <string name="feld_email">Bitte geben sie hier die Email Adresse ein, auf der sie die Emails mit der Position dieses Gerätes empfangen wollen</string>
+    <string name="feld_email">Bitte geben sie hier die Email Adresse ein, auf der sie die Emails mit der Position dieses Gerätes empfangen wollen:</string>
 
 </resources>

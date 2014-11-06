@@ -26,71 +26,86 @@ import android.util.Log;
 public class Email {
 	String currentLocation;
 	
-	public Email(Context context){
-		startLocationListener(context);
-	}
-	
 	@SuppressLint("NewApi")
-	public void sendEmail(String emailadress, String subject, String content) throws AddressException, MessagingException {		
-		//Festlegung der Variablen für smtp aus der Datenbank für die "Session":
-		String host = "smtp.gmail.com";
-		String address = "chasethetracenoreply@gmail.com";
+	public void sendEmail(final String emailadress, final String subject, final String content) throws AddressException, MessagingException {	
 		
-		String from = "chasethetracenoreply@gmail.com";
-		String pass = "cttaelns";
-		String to = emailadress;
+		Runnable Emailsenden=new Runnable(){
+			
+		    @Override
+		    public void run() {
+		        try { 
+					//Festlegung der Variablen für smtp aus der Datenbank für die "Session":
+					String host = "smtp.gmail.com";
+					String address = "chasethetracenoreply@gmail.com";
+					
+					String from = "chasethetracenoreply@gmail.com";
+					String pass = "cttaelns";
+					String to = emailadress;
+					
+					Multipart multiPart;
+					String finalString="";
+					
+					//Eigenschaften (Properties) für die session festlegen:
+					Properties props = System.getProperties();
+					props.put("mail.smtp.starttls.enable", "true");
+					props.put("mail.smtp.host", host);
+					props.put("mail.smtp.user", address);
+					props.put("mail.smtp.password", pass);
+					props.put("mail.smtp.port", "587");
+					props.put("mail.smtp.auth", "true");
+					Session session = Session.getDefaultInstance(props, null);
+					
+					//Session und Datahandler (zur Übertragung der Daten) in einer 
+					//Mime-Message zusammenfassen:
+					DataHandler handler=new DataHandler(new ByteArrayDataSource(finalString.getBytes(),"text/plain" ));
+					MimeMessage message = new MimeMessage(session);
+					message.setFrom(new InternetAddress(from));
+					message.setDataHandler(handler);
+					
+					multiPart=new MimeMultipart();
+			
+					//Empfängeradresse in Internetadresse umwandeln und der Mime-Message als 
+					//Eigenschaft anhängen:
+					InternetAddress toAddress;
+					toAddress = new InternetAddress(to);
+					message.addRecipient(Message.RecipientType.TO, toAddress);
+					
+					//Betreff, eigentlicher Emailinhalt und der Verweis auf den hier verwendeten
+					//multiPart werden der Mime-Message übergeben:
+					message.setSubject(subject);
+					message.setContent(multiPart);
+					message.setText(content);
+					
+					
+					//Transport initiieren:
+					Transport transport = session.getTransport("smtp");
+					
+					//Transportbefehl mit dem Email Server verbinden:
+					try {
+						transport.connect(host,address , pass);
+					}
+					catch (Exception e){
+						Log.v("ERROR!!!", e.toString());
+					}
+					
+					//Transportbefehl ausführen:
+					transport.sendMessage(message, message.getAllRecipients());
+					transport.close();
+					Log.v("Debug", "Email versendet!");
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }
+		};
 		
-		Multipart multiPart;
-		String finalString="";
-		
-		//Eigenschaften (Properties) für die session festlegen:
-		Properties props = System.getProperties();
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", host);
-		props.put("mail.smtp.user", address);
-		props.put("mail.smtp.password", pass);
-		props.put("mail.smtp.port", "587");
-		props.put("mail.smtp.auth", "true");
-		Session session = Session.getDefaultInstance(props, null);
-		
-		//Session und Datahandler (zur Übertragung der Daten) in einer 
-		//Mime-Message zusammenfassen:
-		DataHandler handler=new DataHandler(new ByteArrayDataSource(finalString.getBytes(),"text/plain" ));
-		MimeMessage message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(from));
-		message.setDataHandler(handler);
-		
-		multiPart=new MimeMultipart();
-
-		//Empfängeradresse in Internetadresse umwandeln und der Mime-Message als 
-		//Eigenschaft anhängen:
-		InternetAddress toAddress;
-		toAddress = new InternetAddress(to);
-		message.addRecipient(Message.RecipientType.TO, toAddress);
-		
-		//Betreff, eigentlicher Emailinhalt und der Verweis auf den hier verwendeten
-		//multiPart werden der Mime-Message übergeben:
-		message.setSubject(subject);
-		message.setContent(multiPart);
-		message.setText(content);
-		
-		
-		//Transport initiieren:
-		Transport transport = session.getTransport("smtp");
-		
-		//Transportbefehl mit dem Email Server verbinden:
-		transport.connect(host,address , pass);
-		
-		//Transportbefehl ausführen:
-		transport.sendMessage(message, message.getAllRecipients());
-		transport.close();
-		Log.v("Lol", "Email versendet!");
+		Thread thread = new Thread(Emailsenden);
+		thread.start();
 	}
 	
 	public void startLocationListener (Context context){
 		//Location-Listener registrieren:
 		
-				LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+				LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 				
 				LocationListener listener = new LocationListener(){
 			        @Override
