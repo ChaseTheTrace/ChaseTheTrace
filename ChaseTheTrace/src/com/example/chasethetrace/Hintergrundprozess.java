@@ -2,9 +2,10 @@ package com.example.chasethetrace;
 
 import java.util.Timer;
 
+import javax.mail.MessagingException;
+
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 public class Hintergrundprozess extends IntentService {
 	public String Email_adress;  
@@ -32,8 +33,17 @@ public class Hintergrundprozess extends IntentService {
 	}
 
 	@Override
-	protected void onHandleIntent(Intent intent) {
-		// TODO Auto-generated method stub
+	protected void onHandleIntent(Intent workIntent) {
+		Email_adress = workIntent.getStringExtra("passed_email");
 		
+		try {
+			if (email.currentLocation != null){
+				email.sendEmail(Email_adress, "Automatisches Positionsupdate", "http://www.maps.google.com/maps/?q=loc:" + email.currentLocation);
+			} else {
+				email.sendEmail(Email_adress, "Automatisches Positionsupdate", "Leider konnte keine Position bestimmt werden.");
+			}			
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
 	}
 }

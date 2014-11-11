@@ -19,9 +19,7 @@ public class MainActivity extends ActionBarActivity {
 	 * 		Platz für die Funktionen!
 	 * 
 	 */
-	LocationManager locationManager;
 	SharedPreferences sharedPref;
-	Email email;
 	
 	public void saveEmail(View v){
 		EditText et = (EditText)findViewById(R.id.Emailfeld);
@@ -43,14 +41,9 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	public void sendLocationEmail(View v){
-		try {
-			if (email.currentLocation != null){
-				email.sendEmail(sharedPref.getString("receiving_email_adress", null), "Resquebutton gedrückt!", "http://www.maps.google.com/maps/?q=loc:" + email.currentLocation);
-			} else {
-				email.sendEmail(sharedPref.getString("receiving_email_adress", null), "Resquebutton gedrückt!", "Leider konnte keine Position bestimmt werden.");
-			}
-		}
-		catch (Exception e) {Log.v("error:", e.toString());}
+		Intent newEmail = new Intent(this, Hintergrundprozess.class);
+		newEmail.putExtra("passed_email", sharedPref.getString("receiving_email_adress", "lasse.kgs@arcor.de"));
+		startService(newEmail);
 		
 	}
 	
@@ -73,9 +66,6 @@ public class MainActivity extends ActionBarActivity {
 		//Initialisierung der Variablen:
 		
 		sharedPref = getSharedPreferences("ChaseTheTrace", 0);
-		
-		email = new Email();
-		email.startLocationListener(getApplicationContext());
 		
 		//Herausfinden, ob die App das erste Mal gestartet wird:
 		
