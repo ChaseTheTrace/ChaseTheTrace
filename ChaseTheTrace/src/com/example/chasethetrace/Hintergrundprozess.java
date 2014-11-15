@@ -6,10 +6,11 @@ import javax.mail.MessagingException;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 public class Hintergrundprozess extends IntentService {
 	public String Email_adress;  
-	private static final int INTERVAL = 30000;
+	private static final int INTERVAL = 300000;
 	Email email;
 	
 	public Hintergrundprozess() {
@@ -38,8 +39,10 @@ public class Hintergrundprozess extends IntentService {
 		
 		try {
 			if (email.currentLocation != null){
+				Log.v("Debug", "Position:" + email.currentLocation);
 				email.sendEmail(Email_adress, "Automatisches Positionsupdate", "http://www.maps.google.com/maps/?q=loc:" + email.currentLocation);
 			} else {
+				Log.v("Debug", "Position:" + email.currentLocation);
 				email.sendEmail(Email_adress, "Automatisches Positionsupdate", "Leider konnte keine Position bestimmt werden.");
 			}			
 		} catch (MessagingException e) {

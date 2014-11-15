@@ -111,7 +111,6 @@ public class Email {
 			        @Override
 			        public void onLocationChanged(Location location) {
 			    		currentLocation = convertToString(location);
-			    		Log.v("Check", currentLocation);
 			        }
 			        	// Uninteressante Optionen, die aber trotzdem gehandlet werden müssen:
 			        @Override
@@ -130,8 +129,7 @@ public class Email {
 	}
 	
 	public String convertToString(Location position){
-		DecimalFormat df = new DecimalFormat("#.###");
-		String locationString = df.format(position.getLatitude()) + "," + df.format(position.getLongitude());
+		String locationString = String.valueOf(position.getLatitude()) + "," + String.valueOf(position.getLongitude());
 		return locationString;
 	}
 	
