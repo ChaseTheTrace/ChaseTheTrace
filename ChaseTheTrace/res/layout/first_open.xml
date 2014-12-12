@@ -6,29 +6,53 @@
 
     <TextView
         android:id="@+id/textView1"
-        android:layout_width="270dp"
+        android:layout_width="298dp"
         android:layout_height="wrap_content"
-        android:text="@string/feld_email"
         android:layout_marginTop="14dp"
+        android:paddingLeft="20dp"
+        android:text="@string/feld_email"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="40dp"
+        android:paddingTop="20dp"
+        android:text="Email Adresse:" />
 
     <EditText
         android:id="@+id/Emailfeld"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10" 
         android:layout_marginTop="14dp"
-        android:inputType="textEmailAddress">
+        android:ems="10"
+        android:inputType="textEmailAddress" >
 
         <requestFocus />
     </EditText>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="40dp"
+        android:paddingTop="20dp"
+        android:text="Ihr Name:" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName" />
 
     <Button
         android:id="@+id/Emailbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="saveEmail"
         android:layout_marginTop="14dp"
+        android:onClick="saveEmail"
         android:text="@string/button_save_email" />
 
 </LinearLayout>

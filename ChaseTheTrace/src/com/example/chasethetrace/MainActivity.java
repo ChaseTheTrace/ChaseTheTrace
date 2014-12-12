@@ -24,12 +24,14 @@ public class MainActivity extends ActionBarActivity {
 	Email email;
 	
 	public void saveEmail(View v){
-		EditText et = (EditText)findViewById(R.id.Emailfeld);
+		EditText emailadress = (EditText)findViewById(R.id.Emailfeld);
+		EditText username = (EditText)findViewById(R.id.username);
 		
 		SharedPreferences.Editor editor = sharedPref.edit();
 		
 		editor.putBoolean("isFirstOpen", false);
-		editor.putString("receiving_email_adress", et.getText().toString());
+		editor.putString("receiving_email_adress", emailadress.getText().toString());
+		editor.putString("parent_name", username.getText().toString());
 		editor.commit();
 		
 		super.setContentView(R.layout.activity_main);
@@ -38,6 +40,7 @@ public class MainActivity extends ActionBarActivity {
 		
 		Intent HintergrundService = new Intent(this, Hintergrundprozess.class);
 		HintergrundService.putExtra("passed_email", sharedPref.getString("receiving_email_adress", "lasse.kgs@arcor.de"));
+		HintergrundService.putExtra("passed_name", sharedPref.getString("parent_name", "lasse.kgs@arcor.de"));
         startService(HintergrundService);
         
 	}
