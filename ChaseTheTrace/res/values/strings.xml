@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-	<!--suppress MissingTranslation -->
+
+    <!--suppress MissingTranslation -->
     <string name="app_name" >Chase The Trace</string>
     <string name="action_settings">Settings</string>
     <string name="button_resque">Hilfe!</string>
     <string name="button_save_email">Speichere die Eingabe und starte die App!</string>
     <string name="feld_email">Herzlich Willkommen bei ChaseTheTrace! \nBitte geben sie hier ihren Namen und ihre E-Mail Adresse ein. \nBeachten sie, dass diese Eingabe nur einmal möglich ist. \nAn die angegebene Adresse wird die Position ihres Kindes gesendet.</string>
+	<string name="email_saved">Vielen Dank, dass sie sich für ChaseTheTrace entschieden haben.\nUnter dem folgenden Link können sie sich über die Bedienung und Nutzungsbedingungen informieren: \n<a href="http://github.com/ChaseTheTrace/ChaseTheTrace">Our Website</a></string>
 
 </resources>

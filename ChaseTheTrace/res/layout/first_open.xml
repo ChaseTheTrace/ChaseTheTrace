@@ -11,7 +11,8 @@
         android:layout_marginTop="14dp"
         android:paddingLeft="20dp"
         android:text="@string/feld_email"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -27,7 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:ems="10"
-        android:inputType="textEmailAddress" >
+        android:inputType="textEmailAddress"
+        android:textSize="15sp" >
 
         <requestFocus />
     </EditText>
@@ -38,21 +40,25 @@
         android:layout_height="wrap_content"
         android:paddingLeft="40dp"
         android:paddingTop="20dp"
-        android:text="Ihr Name:" />
+        android:text="Ihr Name:"
+        android:textSize="15sp" />
 
     <EditText
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:textSize="15sp" />
 
     <Button
         android:id="@+id/Emailbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="14dp"
-        android:onClick="saveEmail"
-        android:text="@string/button_save_email" />
+        android:onClick="firstOpenFinish"
+        android:text="@string/button_save_email"
+        android:textSize="15sp" />
 
 </LinearLayout>

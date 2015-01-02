@@ -28,11 +28,6 @@ public class Email {
 	
 	@SuppressLint("NewApi")
 	public void sendEmail(final String emailadress, final String subject, final String content) throws AddressException, MessagingException {	
-		
-		Runnable Emailsenden=new Runnable(){
-			
-		    @Override
-		    public void run() {
 		        try { 
 					//Festlegung der Variablen für smtp aus der Datenbank für die "Session":
 					String host = "smtp.gmail.com";
@@ -91,15 +86,10 @@ public class Email {
 					//Transportbefehl ausführen:
 					transport.sendMessage(message, message.getAllRecipients());
 					transport.close();
-					Log.v("Debug", "Email versendet!");
+					Log.v("Note", "Email versendet!");
 		        } catch (Exception e) {
 		            e.printStackTrace();
 		        }
-		    }
-		};
-		
-		Thread thread = new Thread(Emailsenden);
-		thread.start();
 	}
 	
 	public void startLocationListener (Context context){

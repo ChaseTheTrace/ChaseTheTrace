@@ -1,5 +1,9 @@
 package com.example.chasethetrace;
 
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,12 +11,14 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
+@SuppressLint("SimpleDateFormat") 
 public class MainActivity extends ActionBarActivity {
 	
 	/*
@@ -22,47 +28,58 @@ public class MainActivity extends ActionBarActivity {
 	LocationManager locationManager;
 	SharedPreferences sharedPref;
 	Email email;
+	Calendar cal = Calendar.getInstance();
+	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	
-	public void saveEmail(View v){
+	public void firstOpenFinish(View v){
+
+		//Referenz zu den Textfeldern herstellen:
 		EditText emailadress = (EditText)findViewById(R.id.Emailfeld);
 		EditText username = (EditText)findViewById(R.id.username);
 		
+		//Einen SharedPreferences Editor initialisieren:
 		SharedPreferences.Editor editor = sharedPref.edit();
 		
+		//Den Editor anweisen, neue Werte in die SharedPreferences zu schreiben:
 		editor.putBoolean("isFirstOpen", false);
 		editor.putString("receiving_email_adress", emailadress.getText().toString());
 		editor.putString("parent_name", username.getText().toString());
 		editor.commit();
 		
+		//Das Layout ändern:
+		super.setContentView(R.layout.second_open);
+		
+		//Den Link im TextView des neuen Layouts "klickbar" machen:
+		TextView textview = (TextView) findViewById(R.id.textView4);
+		textview.setMovementMethod(LinkMovementMethod.getInstance());
+	}
+	
+	public void secondOpenFinish (View v){
+		//Layout ändern:
 		super.setContentView(R.layout.activity_main);
 		
 		//Hintergrundprozess starten:
-		
 		Intent HintergrundService = new Intent(this, Hintergrundprozess.class);
-		HintergrundService.putExtra("passed_email", sharedPref.getString("receiving_email_adress", "lasse.kgs@arcor.de"));
-		HintergrundService.putExtra("passed_name", sharedPref.getString("parent_name", "lasse.kgs@arcor.de"));
-        startService(HintergrundService);
-        
+		HintergrundService.putExtra("passed_email", sharedPref.getString("receiving_email_adress", ""));
+		HintergrundService.putExtra("passed_name", sharedPref.getString("parent_name", "Elternteil"));
+		startService(HintergrundService);
+		        
 	}
 	
 	public void sendLocationEmail(View v){
-		try {
-			if (email.currentLocation != null){
-				email.sendEmail(sharedPref.getString("receiving_email_adress", null), "Resquebutton gedrückt!", "http://www.maps.google.com/maps/?q=loc:" + email.currentLocation);
-			} else {
-				email.sendEmail(sharedPref.getString("receiving_email_adress", null), "Resquebutton gedrückt!", "Leider konnte keine Position bestimmt werden.");
-			}
+				Intent HintergrundService = new Intent(this, Hintergrundprozess.class);
+				HintergrundService.putExtra("passed_email", sharedPref.getString("receiving_email_adress", ""));
+				HintergrundService.putExtra("passed_name", sharedPref.getString("parent_name", "Elternteil"));
+		        startService(HintergrundService);
+		        finish();
 		}
-		catch (Exception e) {Log.v("error:", e.toString());}
-		
-	}
 	
 	
 	
 
 	
 	/*
-	 * 		OnCreate-Funktion, Festlegung jegliche Interaktion des Layouts!
+	 * 		OnCreate-Funktionen
 	 * 
 	 */
 
@@ -77,9 +94,7 @@ public class MainActivity extends ActionBarActivity {
 		
 		sharedPref = getSharedPreferences("ChaseTheTrace", 0);
 		
-		email = new Email();
-		email.startLocationListener(getApplicationContext());
-		
+	
 		//Herausfinden, ob die App das erste Mal gestartet wird:
 		
 		if (sharedPref.getBoolean("isFirstOpen", true) == true){
